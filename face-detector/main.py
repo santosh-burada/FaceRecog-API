@@ -1,6 +1,6 @@
 import io
 import os
-
+from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image
@@ -21,7 +21,9 @@ def crop_face(image):
     Returns:
         numpy.ndarray: The cropped face as a NumPy array, or None if no face is detected.
     """
-    face_classifier = cv2.CascadeClassifier("../DataSetsPre/haarcascade_frontalface_default.xml")
+    script_path = Path(__file__)
+    cascade_path = script_path.parent.parent / "DataSetsPre" / "haarcascade_frontalface_default.xml"
+    face_classifier = cv2.CascadeClassifier(str(cascade_path))
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = face_classifier.detectMultiScale(gray, 1.3, 5)
 

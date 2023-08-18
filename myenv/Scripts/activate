@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Santosh_Burada\Desktop\Face-API\FaceRecog-API\face-detector\detector"
+VIRTUAL_ENV="C:\Users\Santosh_Burada\Desktop\Face-API\FaceRecog-API\myenv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
@@ -55,9 +55,9 @@ fi
 
 if [ -z "${VIRTUAL_ENV_DISABLE_PROMPT:-}" ] ; then
     _OLD_VIRTUAL_PS1="${PS1:-}"
-    PS1="(detector) ${PS1:-}"
+    PS1="(myenv) ${PS1:-}"
     export PS1
-    VIRTUAL_ENV_PROMPT="(detector) "
+    VIRTUAL_ENV_PROMPT="(myenv) "
     export VIRTUAL_ENV_PROMPT
 fi
 

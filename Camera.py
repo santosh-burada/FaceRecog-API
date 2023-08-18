@@ -73,7 +73,7 @@ def capture_and_process_frames():
 
                 cv2.imshow("detected", numpy.array(processedImage))
                 if k == ord('c'):
-                    name = input("Enter Name of the full name of person: ")
+                    name = input("Enter full name of person: ")
                     filepath = create_folder("./CapturedData", name, False)
                     image_name = str(name + "_" + str(counter) + ".jpeg")
                     cv2.imwrite(os.path.join(filepath, image_name), numpy.array(processedImage))
