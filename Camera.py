@@ -56,7 +56,7 @@ def capture_and_process_frames():
     The loop continues until the user presses the 'ESC' key (ASCII code 27), at which point
     the function releases the camera and closes all OpenCV windows.
     """
-    send_url = 'http://127.0.0.1:5000/detectface'
+    send_url = 'http://127.0.0.1:8000/crop_face'
     counter = 0
     cap = cv2.VideoCapture(0)
     while True:
@@ -69,9 +69,11 @@ def capture_and_process_frames():
             response = requests.post(send_url, files={'image': ('image.jpeg', image_file)})
             if response.ok:
                 counter += 1
-                processedImage = Image.open(BytesIO(response.content))
-
-                cv2.imshow("detected", numpy.array(processedImage))
+                if response.headers["Content-Type"] == "image/png":
+                    processedImage = Image.open(BytesIO(response.content))
+                    cv2.imshow("detected", numpy.array(processedImage))
+                # else:
+                #     print(response.content)
                 if k == ord('c'):
                     name = input("Enter full name of person: ")
                     filepath = create_folder("./CapturedData", name, False)

@@ -1,26 +1,27 @@
-import io
-import os
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+from PIL import Image
 from pathlib import Path
 import cv2
 import numpy as np
-from PIL import Image
-from flask import Flask, request, make_response
-from werkzeug.datastructures import FileStorage
-from werkzeug.utils import send_file
+import io
 
-app = Flask(__name__)
+# Initialize the FastAPI app
+app = FastAPI()
+
+# CORS middleware settings (Optional, only if you want to enable CORS)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-def crop_face(image):
-    """
-    Crop the face from the input image using the Haar Cascade Classifier.
-
-    Args:
-        image (numpy.ndarray): Input image as a NumPy array.
-
-    Returns:
-        numpy.ndarray: The cropped face as a NumPy array, or None if no face is detected.
-    """
+# Function to crop face; assumes this function already exists and works as intended
+def crop_face(image: np.ndarray):
     script_path = Path(__file__)
     cascade_path = script_path.parent.parent / "DataSetsPre" / "haarcascade_frontalface_default.xml"
     face_classifier = cv2.CascadeClassifier(str(cascade_path))
@@ -33,35 +34,24 @@ def crop_face(image):
     return None
 
 
-@app.route('/detectface', methods=['POST'])
-def detect():
-    if 'image' not in request.files:
-        return "No image found in request files", 400
+@app.post("/crop_face/")
+async def crop_face_endpoint(image: UploadFile = File(...)):
+    image_stream = io.BytesIO(await image.read())
+    image = Image.open(image_stream)
+    image_np = np.array(image)
 
-    image_data = request.files['image'].read()
-    image = Image.open(io.BytesIO(image_data))
+    cropped_face = crop_face(image_np)
+    if cropped_face is None:
+        return {"error": "No face detected"}
 
-    try:
-        face = crop_face(np.array(image))
-        if face is not None:
-            face = cv2.resize(face, (450, 450))
-            face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
-        else:
-            return "No face detected in the image", 400
-    except Exception as e:
-        return f"Error while processing image: {str(e)}", 400
+    # Convert the NumPy array back to a PIL Image
+    img_pil = Image.fromarray(cropped_face)
 
-    output = io.BytesIO()
-    face_pil = Image.fromarray(face)
-    face_pil = face_pil.resize((450, 450)).convert('L')
-    face_pil.save(output, format='JPEG')
-    output.seek(0)
+    # Save PIL Image to BytesIO object and get the byte array
+    img_byte_arr = io.BytesIO()
+    img_pil.save(img_byte_arr, format='PNG')
+    img_byte_arr = img_byte_arr.getvalue()
 
-    response = make_response(output.getvalue())
-    response.headers.set('Content-Type', 'image/jpeg')
-    response.headers.set('Content-Disposition', 'attachment', filename='processed_image.jpeg')
-    return response
+    img_byte_io = io.BytesIO(img_byte_arr)
+    return StreamingResponse(img_byte_io, media_type="image/png")
 
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

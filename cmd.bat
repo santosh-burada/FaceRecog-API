@@ -1,2 +1,2 @@
-@echo off
-C:\Users\Santosh_Burada\Desktop\Face-API\FaceRecog-API\face-detector\detector\Scripts\python.exe C:\Users\Santosh_Burada\Desktop\Face-API\FaceRecog-API\face-detector\main.py
+call face-detector/detector/Scripts/activate
+uvicorn face-detector.main:app --host 127.0.0.1 --port 8000 --reload
