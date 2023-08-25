@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Feed and Face Cropping</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Live Camera Feed</h1>
+        <video id="liveFeed" width="480" height="320" autoplay></video>
+
+        <h2>Cropped Face</h2>
+        <img id="croppedFace" src="" alt="Cropped Face will appear here">
+
+        <h3>Save Cropped Image</h3>
+        <label for="userName">Name:</label>
+        <input type="text" id="userName" name="userName" required>
+        <button id="captureButton">Capture</button>
+
+        <h3>Configure AWS</h3>
+        <form id="awsConfigForm">
+            <label for="awsAccessKey">AWS Access Key:</label>
+            <input type="text" id="awsAccessKey" name="awsAccessKey" required><br><br>
+
+            <label for="awsSecretKey">AWS Secret Key:</label>
+            <input type="text" id="awsSecretKey" name="awsSecretKey" required><br><br>
+
+            <input type="submit" value="Configure">
+        </form>
+    </div>
+
+    <script src="/static/client.js"></script>
+</body>
+
+</html>
