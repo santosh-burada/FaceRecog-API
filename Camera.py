@@ -3,10 +3,11 @@ from io import BytesIO
 
 import cv2
 import numpy
+import numpy as np
 import requests
 from PIL import Image
 
-
+face_arrays = []
 def create_folder(parent_folder, folder_name, exist_ok):
     """
         Create a new folder with the given name inside the specified parent folder.
@@ -69,16 +70,23 @@ def capture_and_process_frames():
             response = requests.post(send_url, files={'image': ('image.jpeg', image_file)})
             if response.ok:
                 counter += 1
-                if response.headers["Content-Type"] == "image/png":
-                    processedImage = Image.open(BytesIO(response.content))
-                    cv2.imshow("detected", numpy.array(processedImage))
-                # else:
-                #     print(response.content)
+                content_type = response.headers.get("Content-Type")
+                if content_type == "application/octet-stream":
+                    shape_str = response.headers.get("shape")
+                    shape = tuple(map(int, shape_str.split(',')))
+                    face_array = np.frombuffer(response.content, dtype=np.uint8)
+                    face_array = face_array.reshape(shape)  # Reshape using dynamic shape
+                    cv2.imshow("cropped image", face_array)
+                elif content_type == "application/json":
+                    # Handle JSON payload
+                    json_data = response.json()
+                    if "error" in json_data:
+                        print(f"Error: {json_data['error']}")
                 if k == ord('c'):
                     name = input("Enter full name of person: ")
                     filepath = create_folder("./CapturedData", name, False)
                     image_name = str(name + "_" + str(counter) + ".jpeg")
-                    cv2.imwrite(os.path.join(filepath, image_name), numpy.array(processedImage))
+                    cv2.imwrite(os.path.join(filepath, image_name), face_array)
         except Exception as e:
             print(e)
         if k == 27:

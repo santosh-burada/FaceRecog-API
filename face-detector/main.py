@@ -1,5 +1,7 @@
+import numpy
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from pathlib import Path
@@ -41,17 +43,19 @@ async def crop_face_endpoint(image: UploadFile = File(...)):
     image_np = np.array(image)
 
     cropped_face = crop_face(image_np)
+
     if cropped_face is None:
-        return {"error": "No face detected"}
+        return JSONResponse(content={"error": "No face detected"}, status_code=400)
+    print(cropped_face,cropped_face.shape)
 
-    # Convert the NumPy array back to a PIL Image
-    img_pil = Image.fromarray(cropped_face)
+    serialized_face = cropped_face.tobytes()
 
-    # Save PIL Image to BytesIO object and get the byte array
-    img_byte_arr = io.BytesIO()
-    img_pil.save(img_byte_arr, format='PNG')
-    img_byte_arr = img_byte_arr.getvalue()
+    headers = {
+        "shape": f"{cropped_face.shape[0]},{cropped_face.shape[1]},{cropped_face.shape[2]}"
+    }
 
-    img_byte_io = io.BytesIO(img_byte_arr)
-    return StreamingResponse(img_byte_io, media_type="image/png")
+    # return JSONResponse(content={"data": serialized_face,
+    #                              "shape": f"{cropped_face.shape[0]},{cropped_face.shape[1]},{cropped_face.shape[2]}"},
+    #                     headers=headers)
+    return StreamingResponse(io.BytesIO(serialized_face), media_type="application/octet-stream", headers=headers)
 
