@@ -31,7 +31,7 @@ def crop_face(image: np.ndarray):
     faces = face_classifier.detectMultiScale(gray, 1.3, 5)
 
     for (x, y, w, h) in faces:
-        return image[y:y + h, x:x + w]
+        return gray[y:y + h, x:x + w]
 
     return None
 
@@ -51,7 +51,7 @@ async def crop_face_endpoint(image: UploadFile = File(...)):
     serialized_face = cropped_face.tobytes()
 
     headers = {
-        "shape": f"{cropped_face.shape[0]},{cropped_face.shape[1]},{cropped_face.shape[2]}"
+        "shape": f"{cropped_face.shape[0]},{cropped_face.shape[1]}"
     }
 
     # return JSONResponse(content={"data": serialized_face,
