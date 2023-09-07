@@ -20,6 +20,12 @@ class FaceCapture:
         self.face_data_list = []
         self.folder_path = "CapturedData"
         os.makedirs(self.folder_path, exist_ok=True)
+        self.new_data_received = False
+
+        self.algorithm = input("Which algorithm would you like to use? (haar/mtcnn): ")
+        if self.algorithm not in ['haar', 'mtcnn']:
+            print("Invalid choice. Using 'haar' as default.")
+            self.algorithm = 'haar'
 
     def capture_and_process_frames(self):
         """Capture webcam frames and process them for face cropping.
@@ -51,9 +57,9 @@ class FaceCapture:
             ]
         """
 
-        send_url = 'http://127.0.0.1:8000/crop_face'
+        send_url = 'http://127.0.0.1:8000/crop_face' if self.algorithm == 'haar' else 'http://127.0.0.1:8001/crop_face_mtcnn'
         cap = cv2.VideoCapture(0)
-
+        capture_count = 0  # Initialize the counter for captured face data
         try:
             while True:
                 ret, frame = cap.read()
@@ -61,14 +67,31 @@ class FaceCapture:
                     print("Failed to capture image")
                     break
 
-                cv2.imshow("frame", frame)
                 user_input = cv2.waitKey(30) & 0xFF
 
-                self._process_frame(send_url, frame, user_input)
+                # Capture data only if 'c' key is pressed
+                if user_input == ord('c'):
+                    self._process_frame(send_url, frame, user_input)
+                cv2.putText(frame, f"Data Captured: {capture_count}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            (0, 255, 0), 2, cv2.LINE_AA)
+                # Include this block to display "Data Captured" on the frame when a face is captured
+                if self.new_data_received:
+                    capture_count += 1  # Increment the counter
 
+                    self.new_data_received = False  # Reset the flag
+
+                # Display the frame
+                cv2.imshow("frame", frame)
+
+                # Handle 'Esc' and 's' keys
                 if user_input == 27:  # Escape key
                     self._save_data()
                     break
+                elif user_input == ord('s'):  # 's' key
+                    self.current_name = input("Enter full name of person: ")
+                    self._save_data()
+                    self.face_data_list.clear()
+                    capture_count = 0  # Reset the counter after saving data
         finally:
             cap.release()
             cv2.destroyAllWindows()
@@ -84,6 +107,7 @@ class FaceCapture:
 
         _, image_enc = cv2.imencode(".jpeg", frame)
         image_file = BytesIO(image_enc.tobytes())
+
 
         try:
             response = requests.post(url, files={'image': ('image.jpeg', image_file)})
@@ -104,16 +128,14 @@ class FaceCapture:
         """
 
         content_type = response.headers.get("Content-Type")
-
         if content_type == "application/octet-stream":
             shape_str = response.headers.get("shape")
             shape = tuple(map(int, shape_str.split(',')))
             face_array = np.frombuffer(response.content, dtype=np.uint8).reshape(shape)
             cv2.imshow("cropped image", face_array)
 
-            if user_input == ord('c'):  # 'c' key
-                self.face_data_list.append(face_array)
-                print("Data Captured")
+            self.face_data_list.append(face_array)
+            self.new_data_received = True  # Set the flag to True to indicate that new data has been received
 
         elif content_type == "application/json":
             json_data = response.json()
