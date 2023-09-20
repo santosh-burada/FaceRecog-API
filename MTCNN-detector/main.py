@@ -21,7 +21,8 @@ def crop_face_mtcnn():
             x, y, w, h = results[0]['box']
             cropped_face = image[y:y + h, x:x + w]
             gray = cv2.cvtColor(cropped_face, cv2.COLOR_BGR2GRAY)
-            print(cropped_face)
+            gray = cv2.resize(gray, (160, 160))
+
             serialized_face = gray.tobytes()
 
             headers = {

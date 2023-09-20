@@ -66,7 +66,7 @@ class FaceCapture:
                 if not ret:
                     print("Failed to capture image")
                     break
-
+                frame = cv2.resize(frame, (640, 480))
                 user_input = cv2.waitKey(30) & 0xFF
 
                 # Capture data only if 'c' key is pressed

@@ -47,7 +47,7 @@ async def crop_face_endpoint(image: UploadFile = File(...)):
     if cropped_face is None:
         return JSONResponse(content={"error": "No face detected"}, status_code=400)
     print(cropped_face,cropped_face.shape)
-
+    cropped_face = cv2.resize(cropped_face, (160, 160))
     serialized_face = cropped_face.tobytes()
 
     headers = {
