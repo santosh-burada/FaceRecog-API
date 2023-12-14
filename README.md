@@ -19,3 +19,36 @@ This project aims to build a robust, scalable, and distributed face recognition 
 - **Cloud Providers**: Support for deployment on various cloud platforms.
 
 ## Python version 3.11.0
+
+## Installation Guide
+
+### Step 1: Setting up the MTCNN-detector
+
+1. **Navigate to the MTCNN-detector Folder**: Open the terminal in the MTCNN-detector directory.
+
+2. **Create and Activate a Python Virtual Environment**:
+   - Create the environment:
+     ```bash
+     python3 -m venv myenv-name
+     ```
+   - Activate the environment:
+     - For Windows:
+       ```bash
+       myenv-name\Scripts\activate
+       ```
+     - For macOS/Linux:
+       ```bash
+       source myenv-name/bin/activate
+       ```
+
+3. **Install TensorFlow**:
+   - TensorFlow will automatically manage package dependencies based on your operating system. Install it using:
+     ```bash
+     pip install tensorflow
+     ```
+
+4. **Install Remaining Dependencies**:
+   - Install the packages specified in `requirements.txt`:
+     ```bash
+     pip install -r requirements.txt
+     ```
