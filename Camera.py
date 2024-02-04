@@ -57,7 +57,9 @@ class FaceCapture:
             ]
         """
 
-        send_url = 'http://127.0.0.1:8000/crop_face' if self.algorithm == 'haar' else 'http://127.0.0.1:8001/crop_face_mtcnn'
+        #send_url = 'http://127.0.0.1:8000/crop_face' if self.algorithm == 'haar' else 'http://127.0.0.1:8001/crop_face_mtcnn'
+        # Please provide host-ip
+        send_url = 'http://<host-ip>:30001/crop_face' if self.algorithm == 'haar' else 'http://<host-ip>:30001/crop_face_mtcnn'
         cap = cv2.VideoCapture(0)
         capture_count = 0  # Initialize the counter for captured face data
         try:

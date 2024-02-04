@@ -1,0 +1,11 @@
+don't involve tensorflow packages in the docker-req.txt directly from the default generated 
+requrements.txt. Because when you do pip freeze in macos it will add tensorflow-macos to the packages.
+It might not be compatiable with the docker base linux image.
+
+run basic docker commands from the current directory like below to build and push the docker image to the docker hub
+
+1) docker build -t crop_face:latest .
+2) docker run -d -p 8001:8001 crop_face 
+3) docker logs <container_id> # to see the wheather the container is running or not.
+4) docker tag 8dd30824c2d7 santoshburada/crop_face:latest
+5) docker push santoshburada/crop_face:latest
