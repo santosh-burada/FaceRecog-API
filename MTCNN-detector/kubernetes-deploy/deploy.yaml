@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crop-face-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crop-face
+  template:
+    metadata:
+      labels:
+        app: crop-face
+    spec:
+      containers:
+      - name: crop-face
+        image: santoshburada/crop_face:latest
+        ports:
+        - containerPort: 8001

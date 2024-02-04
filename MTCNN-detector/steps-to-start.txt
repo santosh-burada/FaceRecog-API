@@ -1,0 +1,2 @@
+source mtcnn-venv/bin/activate
+sudo python3 main.py

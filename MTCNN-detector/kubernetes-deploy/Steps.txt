@@ -1,0 +1,9 @@
+Deploy this 2 yaml files directly and we can access the application with the host ip address and nodeport.
+
+If we do the curl it will give the below default response
+
+<!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
