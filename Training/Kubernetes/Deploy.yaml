@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: train-face-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: train-face
+  template:
+    metadata:
+      labels:
+        app: train-face
+    spec:
+      containers:
+      - name: train-face
+        image: santoshburada/train_face:latest
+        ports:
+        - containerPort: 8002
