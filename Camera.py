@@ -22,6 +22,7 @@ class FaceCapture:
         os.makedirs(self.folder_path, exist_ok=True)
         self.new_data_received = False
 
+        self.email = input("Enter your email: ")
         self.algorithm = input("Which algorithm would you like to use? (haar/mtcnn): ")
         if self.algorithm not in ['haar', 'mtcnn']:
             print("Invalid choice. Using 'haar' as default.")
@@ -59,7 +60,7 @@ class FaceCapture:
 
         #send_url = 'http://127.0.0.1:8000/crop_face' if self.algorithm == 'haar' else 'http://127.0.0.1:8001/crop_face_mtcnn'
         # Please provide host-ip
-        send_url = 'http://<host-ip>:30001/crop_face' if self.algorithm == 'haar' else 'http://<host-ip>:30001/crop_face_mtcnn'
+        send_url = ' http://192.168.1.159:30001/crop_face' if self.algorithm == 'haar' else ' http://192.168.1.159:30001/crop_face_mtcnn'
         cap = cv2.VideoCapture(0)
         capture_count = 0  # Initialize the counter for captured face data
         try:
@@ -109,10 +110,10 @@ class FaceCapture:
 
         _, image_enc = cv2.imencode(".jpeg", frame)
         image_file = BytesIO(image_enc.tobytes())
-
+        headers = {'Email': self.email}
 
         try:
-            response = requests.post(url, files={'image': ('image.jpeg', image_file)})
+            response = requests.post(url, files={'image': ('image.jpeg', image_file)}, headers=headers)
             response.raise_for_status()
             self._handle_response(response, user_input)
         except requests.RequestException as e:

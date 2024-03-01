@@ -1,6 +1,6 @@
 don't involve tensorflow packages in the docker-req.txt directly from the default generated 
 requrements.txt. Because when you do pip freeze in macos it will add tensorflow-macos to the packages.
-It might not be compatiable with the docker base linux image.
+It might not be compatiable with the docker base linux image. In case of windows it will add intel tensorflow pckages.
 
 run basic docker commands from the current directory like below to build and push the docker image to the docker hub
 
