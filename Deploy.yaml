@@ -119,21 +119,21 @@ spec:
   rules:
   - http:
       paths:
-      - path: /crop-face
+      - path: /crop_face_mtcnn
         pathType: Prefix
         backend:
           service:
             name: crop-face-service
             port:
               number: 8001
-      - path: /train-face
+      - path: /process_images
         pathType: Prefix
         backend:
           service:
             name: train-face-service
             port:
               number: 8002
-      - path: /face-rec
+      - path: /recognize
         pathType: Prefix
         backend:
           service:
