@@ -110,33 +110,33 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: facerec
-  name: ingress-2048
+  name: ingress-facerec
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
 spec:
   ingressClassName: alb
   rules:
-    - http:
-        paths:
-        - path: /crop-face
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: crop-face-service
-                port:
-                  number: 8001
-        - path: /train-face
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: train-face-service
-                port:
-                  number: 8002
-        - path: /face-rec
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: face-rec-service
-                port:
-                  number: 8005
+  - http:
+      paths:
+      - path: /crop-face
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: crop-face-service
+            port:
+              number: 8001
+      - path: /train-face
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: train-face-service
+            port:
+              number: 8002
+      - path: /face-rec
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: face-rec-service
+            port:
+              number: 8005
