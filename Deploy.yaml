@@ -120,21 +120,21 @@ spec:
   - http:
       paths:
       - path: /crop-face
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: crop-face-service
             port:
               number: 8001
       - path: /train-face
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: train-face-service
             port:
               number: 8002
       - path: /face-rec
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: face-rec-service
