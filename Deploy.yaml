@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: crop-face
-        image: santoshburada/crop_face:latest-multiArch
+        image: santoshburada/crop_face:latest_multiArch
         ports:
         - containerPort: 8001
 ---
