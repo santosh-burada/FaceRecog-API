@@ -141,7 +141,7 @@ spec:
             port:
               number: 8005
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: recog-hpa
@@ -167,7 +167,7 @@ spec:
         type: Utilization
         averageUtilization: 50
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: crop-hpa
@@ -193,7 +193,7 @@ spec:
         type: Utilization
         averageUtilization: 50
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: train-hpa
