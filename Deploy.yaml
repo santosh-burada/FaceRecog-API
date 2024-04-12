@@ -10,7 +10,7 @@ metadata:
   name: crop-face-deployment
   namespace: facerec
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: crop-face
@@ -44,7 +44,7 @@ metadata:
   name: train-face-deployment
   namespace: facerec
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: train-face
@@ -78,7 +78,7 @@ metadata:
   name: face-rec-deployment
   namespace: facerec
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: face-rec
@@ -140,3 +140,83 @@ spec:
             name: face-rec-service
             port:
               number: 8005
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: recog-hpa
+  namespace: facerec
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: face-rec-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: crop-hpa
+  namespace: facerec
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: crop-face-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: train-hpa
+  namespace: facerec
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: train-face-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+
+
