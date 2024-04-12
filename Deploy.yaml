@@ -1,0 +1,142 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: facerec
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crop-face-deployment
+  namespace: facerec
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crop-face
+  template:
+    metadata:
+      labels:
+        app: crop-face
+    spec:
+      containers:
+      - name: crop-face
+        image: santoshburada/crop_face:latest
+        ports:
+        - containerPort: 8001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crop-face-service
+  namespace: facerec
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8001
+    targetPort: 8001
+  selector:
+    app: crop-face
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: train-face-deployment
+  namespace: facerec
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: train-face
+  template:
+    metadata:
+      labels:
+        app: train-face
+    spec:
+      containers:
+      - name: train-face
+        image: santoshburada/train_face:latest
+        ports:
+        - containerPort: 8002
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: train-face-service
+  namespace: facerec
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8002
+    targetPort: 8002
+  selector:
+    app: train-face
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: face-rec-deployment
+  namespace: facerec
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: face-rec
+  template:
+    metadata:
+      labels:
+        app: face-rec
+    spec:
+      containers:
+      - name: face-rec
+        image: santoshburada/face_rec:latest
+        ports:
+        - containerPort: 8005
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: face-rec-service
+  namespace: facerec
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8005
+    targetPort: 8005
+  selector:
+    app: face-rec
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: facerec
+  name: ingress-2048
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /crop-face
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: crop-face-service
+                port:
+                  number: 8001
+        - path: /train-face
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: train-face-service
+                port:
+                  number: 8002
+        - path: /face-rec
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: face-rec-service
+                port:
+                  number: 8005
