@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: crop-face
-        image: santoshburada/crop_face:latest
+        image: santoshburada/crop_face:latest-multiArch
         ports:
         - containerPort: 8001
 ---
@@ -55,7 +55,7 @@ spec:
     spec:
       containers:
       - name: train-face
-        image: santoshburada/train_face:latest
+        image: santoshburada/train_face:latest-multiArch
         ports:
         - containerPort: 8002
 ---
@@ -89,7 +89,7 @@ spec:
     spec:
       containers:
       - name: face-rec
-        image: santoshburada/face_rec:latest
+        image: santoshburada/face_rec:latest_amd64
         ports:
         - containerPort: 8005
 ---
