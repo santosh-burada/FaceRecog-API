@@ -135,3 +135,4 @@ face-detector/test.py
 test.py
 scripts.py
 MTCNN-detector/mtcnn-venv
+Training/training-venv
