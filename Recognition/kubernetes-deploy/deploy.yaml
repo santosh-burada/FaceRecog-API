@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: face-rec-deployment
+  namespace: facerec
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: face-rec
+  template:
+    metadata:
+      labels:
+        app: face-rec
+    spec:
+      containers:
+      - name: face-rec
+        image: santoshburada/face_rec:latest
+        ports:
+        - containerPort: 8005
