@@ -89,7 +89,7 @@ spec:
     spec:
       containers:
       - name: face-rec
-        image: santoshburada/face_rec:latest_amd64
+        image: santoshburada/face_rec:amd64
         ports:
         - containerPort: 8005
 ---
