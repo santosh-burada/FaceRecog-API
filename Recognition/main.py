@@ -42,7 +42,7 @@ def connect_to_mongodb_atlas(connection_string, database_name):
         exit()
 
 # MongoDB setup
-connection_string = "mongodb+srv://santuburada99:L7T3TUVD1KOkLtLJ@train-facerec.8dl5kmd.mongodb.net/?retryWrites=true&w=majority&appName=Train-faceRec"
+connection_string = "mongodb+srv://santuburada99:L7T3TUVD1KOkLtLJ@train-facerec.8dl5kmd.mongodb.net/?retryWrites=true&w=majority&ssl=true&appName=Train-faceRec"
 database_name = "Train-faceRec"
 db = connect_to_mongodb_atlas(connection_string, database_name)
 train_collection = db["Training_Data"]
@@ -105,7 +105,7 @@ def FaceRecognition():
     x, y, w, h = 0, 0, 0, 0
 
    
-    frame = imutils.resize(frame, width=600)
+    # frame = imutils.resize(frame, width=600)
 
     # grab the frame dimensions and convert it to a blob
     (h, w) = frame.shape[:2]
