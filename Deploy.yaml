@@ -10,7 +10,7 @@ metadata:
   name: crop-face-deployment
   namespace: facerec
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: crop-face
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: crop-face
-        image: santoshburada/crop_face:latest
+        image: santoshburada/crop_face:latest_multiArch
         ports:
         - containerPort: 8001
 ---
@@ -44,7 +44,7 @@ metadata:
   name: train-face-deployment
   namespace: facerec
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: train-face
@@ -55,9 +55,9 @@ spec:
     spec:
       containers:
       - name: train-face
-        image: santoshburada/train_face:latest
+        image: santoshburada/train_face:latest-multiArch
         ports:
-        - containerPort: 8002
+        - containerPort: 8003
 ---
 apiVersion: v1
 kind: Service
@@ -67,8 +67,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 8002
-    targetPort: 8002
+  - port: 8003
+    targetPort: 8003
   selector:
     app: train-face
 ---
@@ -78,7 +78,7 @@ metadata:
   name: face-rec-deployment
   namespace: facerec
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: face-rec
@@ -89,7 +89,7 @@ spec:
     spec:
       containers:
       - name: face-rec
-        image: santoshburada/face_rec:latest
+        image: santoshburada/face_rec:amd64
         ports:
         - containerPort: 8005
 ---
@@ -110,33 +110,113 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: facerec
-  name: ingress-2048
+  name: ingress-facerec
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
 spec:
   ingressClassName: alb
   rules:
-    - http:
-        paths:
-        - path: /crop-face
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: crop-face-service
-                port:
-                  number: 8001
-        - path: /train-face
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: train-face-service
-                port:
-                  number: 8002
-        - path: /face-rec
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: face-rec-service
-                port:
-                  number: 8005
+  - http:
+      paths:
+      - path: /crop_face_mtcnn
+        pathType: Prefix
+        backend:
+          service:
+            name: crop-face-service
+            port:
+              number: 8001
+      - path: /process_images
+        pathType: Prefix
+        backend:
+          service:
+            name: train-face-service
+            port:
+              number: 8003
+      - path: /recognize
+        pathType: Prefix
+        backend:
+          service:
+            name: face-rec-service
+            port:
+              number: 8005
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: recog-hpa
+  namespace: facerec
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: face-rec-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: crop-hpa
+  namespace: facerec
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: crop-face-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: train-hpa
+  namespace: facerec
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: train-face-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+
+
