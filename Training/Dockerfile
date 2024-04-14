@@ -3,7 +3,6 @@ FROM python:3.9-slim-buster
 
 # Set the working directory in the container
 WORKDIR /app
-
 # Install system dependencies required for dlib, OpenCV, and other Python packages.
 # Note: Debian uses apt-get, not apk (Alpine package manager).
 RUN apt-get update && apt-get install -y \
@@ -12,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libjpeg-dev \
     zlib1g-dev \
+    ca-certificates \
     g++ \
     make \
     liblapack-dev \
@@ -19,8 +19,7 @@ RUN apt-get update && apt-get install -y \
     libstdc++6 \
     libblas-dev \
     liblapack-dev \
-    # Additional tools that might be necessary for some Python packages
-    git \
+    libkrb5-dev \
     # Cleanup the apt cache to reduce image size
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

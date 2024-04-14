@@ -6,19 +6,25 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV FLASK_APP=main.py
 ENV FLASK_RUN_HOST=0.0.0.0
+ENV CUDA_VISIBLE_DEVICES=-1
 
 # Set the working directory in the container
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     libsm6 libxext6 libxrender-dev \
+    ca-certificates \
     libgl1-mesa-dev \
     libglib2.0-0 \
-    libgl1-mesa-glx
+    libgl1-mesa-glx \
+    pkg-config \
+    libhdf5-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 
 # Install TensorFlow
-RUN pip install tensorflow==2.15.0 opencv-python
+RUN pip install tensorflow==2.15.0
 
 # Copy the current directory contents into the container at /app
 COPY docker-req.txt .

@@ -4,10 +4,15 @@ from pymongo import MongoClient, errors
 from wtforms import StringField,PasswordField,SubmitField, validators
 from wtforms.validators import DataRequired, Email, ValidationError
 import jwt
+import os
 from pydantic import BaseModel
 import datetime
 from passlib.context import CryptContext
 import re
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 app = Flask(__name__)
 def connect_to_mongodb_atlas(connection_string, database_name):
@@ -23,11 +28,11 @@ def connect_to_mongodb_atlas(connection_string, database_name):
         exit()
 
 # MongoDB setup
-connection_string = "mongodb+srv://santuburada99:L7T3TUVD1KOkLtLJ@train-facerec.8dl5kmd.mongodb.net/?retryWrites=true&w=majority&appName=Train-faceRec"
-database_name = "Train-faceRec"
+connection_string = os.getenv('MONGO_URI')
+database_name = os.getenv('DATABASE_NAME')
 
 # Secret key for JWT
-app.config['SECRET_KEY'] = 'd9d502471ad8f1f8570239a6de9d7630be2696a53b8174983ad014700f3ff9a8' # openssl rand -hex 32
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') # openssl rand -hex 32
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30

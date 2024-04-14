@@ -2,13 +2,17 @@ from flask import Flask, request, Response, jsonify
 from mtcnn.mtcnn import MTCNN
 import numpy as np
 import cv2
+import os
 from pymongo import MongoClient, errors
 from functools import wraps
 import jwt
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'd9d502471ad8f1f8570239a6de9d7630be2696a53b8174983ad014700f3ff9a8'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 def connect_to_mongodb_atlas(connection_string, database_name):
     """Connect to MongoDB Atlas and return the database object."""
@@ -23,8 +27,9 @@ def connect_to_mongodb_atlas(connection_string, database_name):
         exit()
 
 # MongoDB setup
-connection_string= "mongodb+srv://santuburada99:L7T3TUVD1KOkLtLJ@train-facerec.8dl5kmd.mongodb.net/?retryWrites=true&w=majority&appName=Train-faceRec"
-database_name = "Train-faceRec"
+
+connection_string= os.getenv('MONGO_URI')
+database_name = os.getenv('DATABASE_NAME')
 db = connect_to_mongodb_atlas(connection_string, database_name) 
 users_collection = db.users
 
@@ -86,6 +91,10 @@ def crop_face_mtcnn():
         print(e)
         return jsonify({"error": str(e)}), 500
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    # Simple health check endpoint
+    return jsonify({"status": "UP"}), 200
 
 if __name__ == '__main__':
     app.run(port=8001)

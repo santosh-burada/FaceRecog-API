@@ -3,20 +3,24 @@ import requests
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-server_url = 'http://192.168.1.159:30005/recognize'
+
+server_url = 'http://127.0.0.1:8005/recognize'
 cap = cv2.VideoCapture(0)  # Use 0 for the default webcam
 executor = ThreadPoolExecutor(max_workers=5)  # Adjust max_workers as needed
-
+email = input("Enter Email For Token Validation: ")
 def send_frame_async(frame):
     """Function to send a frame to the server asynchronously."""
     try:
         # Encode frame as JPEG to reduce size and send as image
         _, buffer = cv2.imencode('.jpg', frame)
-        
+        headers = {
+            'Email': email
+        }
         # Convert to bytes and send to server using a POST request
         response = requests.post(
             server_url,
             files={"image": buffer.tobytes()},
+            headers=headers,
         )
         
         # Process the server response

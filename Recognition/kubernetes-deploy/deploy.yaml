@@ -18,3 +18,6 @@ spec:
         image: santoshburada/face_rec:latest
         ports:
         - containerPort: 8005
+        envFrom:  # Use all keys in the secret as environment variables
+        - secretRef:
+            name: my-env-secret

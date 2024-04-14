@@ -136,3 +136,12 @@ test.py
 scripts.py
 MTCNN-detector/mtcnn-venv
 Training/training-venv
+.env
+Recognition/rec-venv
+Recognition/recognition-venv
+Training/Mongotest.py
+Training/Output/*
+Recognition/*.png
+Atlas
+Auth/auth-venv
+Camera.py

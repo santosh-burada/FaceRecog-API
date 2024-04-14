@@ -24,6 +24,9 @@ spec:
         image: santoshburada/crop_face:latest_multiArch
         ports:
         - containerPort: 8001
+        envFrom:  # Use all keys in the secret as environment variables
+        - secretRef:
+            name: my-env-secret
 ---
 apiVersion: v1
 kind: Service
@@ -58,6 +61,10 @@ spec:
         image: santoshburada/train_face:latest-multiArch
         ports:
         - containerPort: 8003
+        envFrom:  # Use all keys in the secret as environment variables
+        - secretRef:
+            name: my-env-secret
+        
 ---
 apiVersion: v1
 kind: Service
@@ -92,6 +99,9 @@ spec:
         image: santoshburada/face_rec:amd64
         ports:
         - containerPort: 8005
+        envFrom:  # Use all keys in the secret as environment variables
+        - secretRef:
+            name: my-env-secret
 ---
 apiVersion: v1
 kind: Service

@@ -1,17 +1,22 @@
 import os
 import cv2
-# import imutils
 import pickle
+import jwt
 import face_recognition
 from pymongo import MongoClient, errors
 import numpy as np
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 from flask import Flask, request, jsonify
+from functools import wraps
 from concurrent.futures import ThreadPoolExecutor
+from dotenv import load_dotenv
+
+load_dotenv()
 
 executor = ThreadPoolExecutor(max_workers=5)
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 print("Packages are Imported")
 
@@ -27,8 +32,6 @@ model = load_model(os.path.sep.join(['model', "liveness.model"]))
 le = pickle.loads(open(os.path.sep.join(['model', "le.pickle"]), "rb").read())
 # Entries expire after 5 minutes
 
-
-
 def connect_to_mongodb_atlas(connection_string, database_name):
     """Connect to MongoDB Atlas and return the database object."""
     try:
@@ -41,13 +44,39 @@ def connect_to_mongodb_atlas(connection_string, database_name):
         print(f"Failed to connect to MongoDB Atlas: {e}")
         exit()
 
-# MongoDB setup
-connection_string = "mongodb+srv://santuburada99:L7T3TUVD1KOkLtLJ@train-facerec.8dl5kmd.mongodb.net/?retryWrites=true&w=majority&ssl=true&appName=Train-faceRec"
-database_name = "Train-faceRec"
+connection_string = os.getenv('MONGO_URI')
+database_name = os.getenv('DATABASE_NAME')
 db = connect_to_mongodb_atlas(connection_string, database_name)
 train_collection = db["Training_Data"]
-# existing_doc = train_collection.find_one({"_id": "santu.burada99@gmail.com"})
-# features = existing_doc.get('features', {})
+users_collection = db.users
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        email = request.headers.get('Email')
+        if not email:
+            return jsonify({'message': 'Email header is missing!'}), 403
+        
+        user = users_collection.find_one({"email": email})
+        if not user:
+            return jsonify({'message': 'User not found!'}), 404
+        
+        token = user.get('token')
+        if not token:
+            return jsonify({'message': 'Token not found for user!'}), 403
+        
+        try:
+            jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token expired, please log in again.'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Invalid token. Please log in again.'}), 403
+
+        return f(*args, **kwargs)
+
+    return decorated_function
+
 def fetch_document_async(collection, document_id):
     """Asynchronously fetch a document from MongoDB."""
     try:
@@ -56,15 +85,6 @@ def fetch_document_async(collection, document_id):
     except Exception as e:
         print(f"Error fetching document: {e}")
         return None
-def fetch_document_async(collection, document_id):
-    """Fetch a document from MongoDB asynchronously."""
-    try:
-        return collection.find_one({"_id": document_id})
-    except Exception as e:
-        print(f"Error fetching document: {e}")
-        return None
-
-# print(features)
 
 def find_best_match(input_encoding, features):
     min_distance = None
@@ -94,7 +114,13 @@ def find_best_match(input_encoding, features):
     else:
         return "Unknown", None
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    # Simple health check endpoint
+    return jsonify({"status": "UP"}), 200
+
 @app.route('/recognize', methods=['POST'])
+@token_required
 def FaceRecognition():
     if 'image' not in request.files:
         return jsonify({"error": "No image provided"}), 400
@@ -103,9 +129,6 @@ def FaceRecognition():
     nparr = np.frombuffer(image_data, np.uint8)
     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     x, y, w, h = 0, 0, 0, 0
-
-   
-    # frame = imutils.resize(frame, width=600)
 
     # grab the frame dimensions and convert it to a blob
     (h, w) = frame.shape[:2]
@@ -118,14 +141,15 @@ def FaceRecognition():
     # predictions
     net.setInput(blob)
     detections = net.forward()
-    # print(detections.shape[2])
+
     c = 0
     k = 5
     recognized_faces = []
     best_match_name = "Unknown"  # Default value
     label = "fake"
     # loop over the detections
-    existing_doc_future = executor.submit(fetch_document_async, train_collection, "santu.burada99@gmail.com")
+    email = request.headers.get('Email')
+    existing_doc_future = executor.submit(fetch_document_async, train_collection, email)
     existing_doc = existing_doc_future.result()  # Wait for the background task to complete
     features = existing_doc.get('features', {}) if existing_doc else {}
 
@@ -135,7 +159,6 @@ def FaceRecognition():
         # extract the confidence (i.e., probability) associated with the
         # prediction
         confidence = detections[0, 0, i, 2]
-        # print(confidence)
 
         # filter out weak detections
         if confidence > 0.5:
@@ -143,7 +166,6 @@ def FaceRecognition():
             # the face and extract the face ROI
             box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
             (startX, startY, endX, endY) = box.astype("int")
-            # print(startX, startY, endX, endY)
             # # ensure the detected bounding box does fall outside the
             # # dimensions of the frame
             startX = max(0, startX)
@@ -154,20 +176,20 @@ def FaceRecognition():
             # # extract the face ROI and then preproces it in the exact
             # # same manner as our training data
             face = frame[startY:endY, startX:endX]
-            # cv2.imshow("imae",face)
+            if face.size == 0 or face.shape[0] == 0 or face.shape[1] == 0:
+                continue 
+
             faceLocation = face_recognition.face_locations(frame)
-            # print(faceLocation)
+
             if len(faceLocation) > 0:
 
                 inputFeatures = face_recognition.face_encodings(frame, faceLocation, model='cnn')
-                # print(inputFeatures)
                    # Here we wil have the input face features
             #     # matching the input feature with the loaded images features.
 
                 for input_encoding in inputFeatures:
                     # Use the find_best_match function to find the closest match in your database
                     best_match_name, distance = find_best_match(input_encoding, features)
-                    # print(f"Match found: {best_match_name} with a distance of {distance}")
                 
                 face = cv2.resize(face, (32, 32))
                 face = face.astype("float") / 255.0
@@ -190,4 +212,4 @@ def FaceRecognition():
     return jsonify({"faces": recognized_faces})
 
 if __name__ == "__main__":
-    app.run(debug=False, port=5005)
+    app.run(debug=False, port=8005)

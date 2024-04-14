@@ -3,8 +3,10 @@ import pickle
 import requests
 import json
 import numpy as np
-
 from pymongo import MongoClient, errors
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def connect_to_mongodb_atlas(connection_string, database_name):
     """Connect to MongoDB Atlas and return the database object."""
@@ -19,8 +21,8 @@ def connect_to_mongodb_atlas(connection_string, database_name):
         exit()
 
 # MongoDB setup
-connection_string = "mongodb+srv://santuburada99:L7T3TUVD1KOkLtLJ@train-facerec.8dl5kmd.mongodb.net/?retryWrites=true&w=majority&appName=Train-faceRec"
-database_name = "Train-faceRec"
+connection_string = os.getenv('MONGO_URI')
+database_name = os.getenv('DATABASE_NAME')
  
 
 # Function to load processed files' records
@@ -104,7 +106,7 @@ def main():
     # Only proceed if there are new or updated files
     if new_or_updated_files:
         # Prepare and send the request
-        url = "http://localhost:8003/process_images"
+        url = "http://127.0.0.1:8003/process_images"
         data = {"images": images_dict}
         headers = {
             "Content-Type": "application/json",

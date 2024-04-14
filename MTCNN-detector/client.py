@@ -18,7 +18,7 @@ class FaceCapture:
     def __init__(self):
         self.current_name = None
         self.face_data_list = []
-        self.folder_path = "CapturedData"
+        self.folder_path = "../CapturedData"
         os.makedirs(self.folder_path, exist_ok=True)
         self.new_data_received = False
 
