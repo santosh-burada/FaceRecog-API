@@ -1,0 +1,21 @@
+apiVersion: atlas.mongodb.com/v1
+kind: AtlasDeployment
+metadata:
+  name: my-atlas-cluster
+  namespace: facerec
+  labels:
+    app.kubernetes.io/version: 1.6.0
+spec:
+  projectRef:
+    name: facerec-project
+  deploymentSpec:
+    name: "FaceRec-cluster"
+    tags:
+     - key: "environment"
+       value: "Development"
+    replicationSpecs:
+      - regionConfigs:
+          - electableSpecs:
+              instanceSize: M0
+            providerName: GCP
+            regionName: US_CENTRAL1

@@ -1,0 +1,12 @@
+apiVersion: atlas.mongodb.com/v1
+kind: AtlasProject
+metadata:
+  name: facerec-project
+  namespace: facerec
+  labels:
+    app.kubernetes.io/version: 1.6.0
+spec:
+  name: FaceRecognition
+  projectIpAccessList:
+    - ipAddress: "<My-IP>"
+      comment: "Allowing access to database from everywhere (only for Demo!)"

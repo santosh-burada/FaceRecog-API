@@ -1,0 +1,15 @@
+apiVersion: atlas.mongodb.com/v1
+kind: AtlasDatabaseUser
+metadata:
+  name: my-database-user
+  labels:
+    app.kubernetes.io/version: 1.6.0
+spec:
+  roles:
+    - roleName: "readWriteAnyDatabase"
+      databaseName: "admin"
+  projectRef:
+    name: facerec-project
+  username: theuser
+  passwordSecretRef:
+    name: the-user-password

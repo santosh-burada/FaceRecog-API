@@ -136,3 +136,7 @@ test.py
 scripts.py
 MTCNN-detector/mtcnn-venv
 Training/training-venv
+Recognition/recognition-venv
+Recognition/rec-venv
+Auth/auth-venv
+
