@@ -1,9 +1,9 @@
 
 # Developing a Scalable and Distributed Face Recognition System using Kubernetes and Docker
+[![GitHub last commit](https://img.shields.io/github/last-commit/santosh-burada/FaceRecog-API)](https://github.com/santosh-burada/FaceRecog-API)
+![GitHub issues](https://img.shields.io/github/issues/santosh-burada/FaceRecog-API)
+![GitHub stars](https://img.shields.io/github/stars/santosh-burada/FaceRecog-API?style=social)
 
-![GitHub last commit](https://img.shields.io/github/last-commit/user/repo)
-![GitHub issues](https://img.shields.io/github/issues/user/repo)
-![GitHub stars](https://img.shields.io/github/stars/user/repo?style=social)
 
 ## Table of Contents
 - [Project Description](#project-description)
