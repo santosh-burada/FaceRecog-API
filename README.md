@@ -27,7 +27,7 @@ This project aims to build a robust, scalable, and distributed face recognition 
 - **Kubernetes**: Manages and orchestrates the containerized applications.
 - **Docker**: Provides containerization for each system component.
 - **Face Recognition Algorithms**: Utilizes state-of-the-art algorithms for high accuracy.
-- **Cloud Providers**: Facilitates deployment on various cloud platforms.
+- **AWS**: Utilized for deploying the application in Amazon Elastic Kubernetes Service (EKS), facilitating scalable and publicly accessible services.
 
 ## Installation Guide
 This guide provides detailed instructions on how to set up and run the project both locally and on Kubernetes.
