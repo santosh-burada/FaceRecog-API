@@ -44,7 +44,7 @@ cd your-repo
 ```
 
 #### 2. Set up a Virtual Environment
-Navigate to the Auth MTCNN-detector Recognition and Training Folder
+Navigate to the Auth, MTCNN-detector, Recognition and Training Folders
 Create and activate a virtual environment to isolate the project dependencies:
 ```bash
 python3 -m venv env
